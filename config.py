@@ -1,0 +1,2 @@
+VK_ACCESS_TOKEN = ""
+WAIT_TIME = 0.4
