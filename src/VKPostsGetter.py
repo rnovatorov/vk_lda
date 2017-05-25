@@ -6,7 +6,7 @@ class VKPostsGetter(object):
     """
     Used to download posts from VK wall
     """
-    def __init__(self, vk_access_token="", wait_time=0.4):
+    def __init__(self, vk_access_token="", wait_time=0.3):
         self.vk_api = self._init_vk_api(vk_access_token)
         self.wait_time = wait_time
         self.MAX_POSTS_PER_REQUEST = 100
@@ -35,27 +35,29 @@ class VKPostsGetter(object):
         print("%d %s posts found on %d wall." % (volume, vk_filter, owner_id))
         if not volume:
             print("Posts by %s downloaded: 0\n" % vk_filter)
-            return []
+            yield []
+            raise StopIteration
 
-        full_wall = []
+        downloaded = 0
         offset = 0
-        while len(full_wall) != volume:
-            if volume - len(full_wall) >= self.MAX_POSTS_PER_REQUEST:
+        while downloaded != volume:
+            if volume - downloaded >= self.MAX_POSTS_PER_REQUEST:
                 count = self.MAX_POSTS_PER_REQUEST
             else:
-                count = volume - len(full_wall)
+                count = volume - downloaded
             bunch = self.vk_api.wall.get(
                 owner_id=owner_id,
                 count=count,
                 offset=offset,
                 filter=vk_filter
             )
-            full_wall.extend(bunch[1:])  # first elements is count
+            for post in bunch[1:]:  # first elements is count
+                downloaded += 1
+                yield post
             offset += count
             time.sleep(self.wait_time)
 
-        print("Posts by %s downloaded: %d\n" % (vk_filter, len(full_wall)))
-        return full_wall
+        # print("Posts by %s downloaded: %d\n" % (vk_filter, len(full_wall)))
 
     def get_comments(self, post, need_likes=0):
         """

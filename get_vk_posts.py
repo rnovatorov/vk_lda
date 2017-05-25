@@ -3,7 +3,7 @@ import json
 import progressbar as pb
 # Project
 import config as conf
-from src.utils import prepare_doc
+from src.utils import prepare_doc, merge_iterators
 from src.VKPostsGetter import VKPostsGetter
 
 
@@ -12,34 +12,32 @@ def main(args):
                          wait_time=conf.WAIT_TIME)
     owner_posts = vkpg.get_posts(args.group_id, vk_filter="owner")
     others_posts = vkpg.get_posts(args.group_id, vk_filter="others")
-    group_posts = owner_posts + others_posts
+    group_posts = owner_posts # merge_iterators(owner_posts, others_posts)
 
     # group_id = -108394847
 
-    if args.need_comments:
-        bar = pb.ProgressBar(
-            maxval=len(group_posts),
-            widgets=[
-                "Getting comments: ",
-                pb.Bar(left="[", marker="=", right="] "),
-                pb.SimpleProgress(),
-            ]
-        ).start()
+    bar = pb.ProgressBar(
+        maxval=2984,
+        widgets=[
+            "Downloading: ",
+            pb.Bar(left="[", marker="=", right="] "),
+            pb.SimpleProgress(),
+        ]
+    ).start()
 
     with open(args.output_path, "w") as f:
         f.write("[\n")  # In order not to hold all comments in memory
         for n, post in enumerate(group_posts):
             if args.need_comments:
-                bar.update(n + 1)
                 comments = vkpg.get_comments(post, need_likes=args.need_likes)
             else:
                 comments = []
+            bar.update(n + 1)
             doc = prepare_doc(post, comments, formatting=args.formatting)
             json.dump(doc, f, indent=args.indent)
             f.write(",\n")
         f.write("]")
-    if args.need_comments:
-        bar.finish()
+    bar.finish()
     print("Done.\n")
 
 
