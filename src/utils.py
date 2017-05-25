@@ -7,5 +7,5 @@ def prepare_doc(post, comments, formatting):
         doc["comments"] = [c["text"] for c in comments if c["text"]]
     elif formatting == "full":
         doc["post"] = post
-        doct["comments"] = comments
+        doc["comments"] = comments
     return doc
