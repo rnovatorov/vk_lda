@@ -6,7 +6,7 @@ class VKPostsGetter(object):
     """
     Used to download posts from VK wall
     """
-    def __init__(self, vk_access_token="", wait_time=0.3):
+    def __init__(self, vk_access_token="", wait_time=0.4):
         self.vk_api = self._init_vk_api(vk_access_token)
         self.wait_time = wait_time
         self.MAX_POSTS_PER_REQUEST = 100
@@ -16,25 +16,22 @@ class VKPostsGetter(object):
         api = vk.API(session)
         return api
 
-    def get_posts(self, owner_id, vk_filter):
+    def count_posts(self, owner_id, vk_filter):
+        response = self.vk_api.wall.get(
+            owner_id=owner_id,
+            count=1,
+            filter=vk_filter
+        )
+        return response[0]
+
+    def get_posts(self, owner_id, vk_filter, volume):
         """
         Gets all posts from group or user wall
 
         Requires waiting for some time between requests to get
         everything because of VK API load balancing politics
         """
-        print("Looking for posts belonging to %s on %d wall..."
-               % (vk_filter, owner_id))
-        response = self.vk_api.wall.get(
-            owner_id=owner_id,
-            count=1,
-            filter=vk_filter
-        )
-        volume = response[0]
-
-        print("%d %s posts found on %d wall." % (volume, vk_filter, owner_id))
         if not volume:
-            print("Posts by %s downloaded: 0\n" % vk_filter)
             yield []
             raise StopIteration
 
@@ -56,8 +53,6 @@ class VKPostsGetter(object):
                 yield post
             offset += count
             time.sleep(self.wait_time)
-
-        # print("Posts by %s downloaded: %d\n" % (vk_filter, len(full_wall)))
 
     def get_comments(self, post, need_likes=0):
         """
