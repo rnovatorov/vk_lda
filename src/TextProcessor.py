@@ -24,11 +24,11 @@ class TextProcessor(object):
         self.stop_words = get_stop_words("ru")
 
         # Used to remove [id123456789|username] in VK comments
-        self.re_reply = re.compile(r"\[id\d+\|.+\]")
+        self.RE_REPLY = re.compile(r"\[id\d+\|.+\]")
         # Used to remove <br> which is \n in VK posts
-        self.re_br = re.compile(r"<br>")
+        self.RE_BR = re.compile(r"<br>")
         # I really suggest you not trying to understand how that works
-        self.re_url = re.compile(
+        self.RE_URL = re.compile(
            r"(?:(?:https?|ftp)://)"
            r"(?:\S+(?::\S*)?@)?"
            r"(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
@@ -83,20 +83,20 @@ class TextProcessor(object):
         """
         Returns doc cleaned of url links
         """
-        return self.re_url.sub("", doc)
+        return self.RE_URL.sub("", doc)
 
     def remove_brs(self, doc):
         """
         Removes <br>
         """
-        return self.re_br.sub("", doc)
+        return self.RE_BR.sub("", doc)
 
     def count_urls(self, doc):
         """
         Counts urls
         Returns a dict {url: amount in doc}
         """
-        urls = self.re_url.findall(doc)
+        urls = self.RE_URL.findall(doc)
         return {u: urls.count(u) for u in set(urls)}
 
     def prepare_for_lda(self, doc, pos=None):
@@ -109,7 +109,7 @@ class TextProcessor(object):
         # Removing <br>
         doc = self.remove_brs(doc)
         # Removing [id123456789|username]
-        doc = self.re_reply.sub("", doc)
+        doc = self.RE_REPLY.sub("", doc)
 
         # Tokenizing
         tokens = self.tokenize(doc)

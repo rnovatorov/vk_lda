@@ -1,6 +1,6 @@
-from argparse import ArgumentParser
 import json
-import progressbar as pb
+from argparse import ArgumentParser
+from tqdm import tqdm
 # Project
 import config as conf
 from src.utils import compose_doc, merge_iterators
@@ -32,26 +32,15 @@ def main(args):
     # Merging them together
     group_posts = merge_iterators(owner_posts, others_posts)
 
-    bar = pb.ProgressBar(
-        maxval=groups_posts_volume,
-        widgets=[
-            "Downloading: ",
-            pb.Bar(left="[", marker="=", right="] "),
-            pb.SimpleProgress(),
-        ]
-    ).start()
-
     docs = []
-    for n, post in enumerate(group_posts):
+    for n, post in tqdm(enumerate(group_posts), total=groups_posts_volume):
         if args.need_comments:
             comments = vkpg.get_comments(post, need_likes=args.need_likes)
         else:
             comments = []
-        bar.update(n)
         doc = compose_doc(post, comments, formatting=args.formatting)
         if doc:
             docs.append(doc)
-    bar.finish()
     
     print("Saving...")
     with open(args.output_path, "w") as f:
