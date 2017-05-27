@@ -2,7 +2,6 @@ import re
 import pymorphy2
 import nltk
 from stop_words import get_stop_words
-from pprint import pprint as pp
 
 
 class TextProcessor(object):
@@ -17,6 +16,9 @@ class TextProcessor(object):
     def __init__(self):
         # MorphAnalyzer instance (should be created only once)
         self.morph = pymorphy2.MorphAnalyzer()
+        # MorphAnalyzer noun tag
+        self.PYMORPHY_NOUN = "NOUN"
+
         # nltk RegexpTokenizer also removes punctuation
         self.tokenizer = nltk.tokenize.RegexpTokenizer(r"\w+")
 
@@ -24,7 +26,7 @@ class TextProcessor(object):
         self.stop_words = get_stop_words("ru")
 
         # Used to remove [id123456789|username] in VK comments
-        self.RE_REPLY = re.compile(r"\[id\d+\|.+\]")
+        self.RE_REPLY = re.compile(r"\[(id|club)\d+\|.+\]")
         # Used to remove <br> which is \n in VK posts
         self.RE_BR = re.compile(r"<br>")
         # I really suggest you not trying to understand how that works
@@ -38,6 +40,7 @@ class TextProcessor(object):
            r"(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*"
            r"(?:\.(?:[a-z\u00a1-\uffff]{2,})))"
            r"(?::\d{2,5})?(?:/[^\s]*)?")
+
 
     def extend_stopwords(self, custom_stopwords):
         """
@@ -55,7 +58,6 @@ class TextProcessor(object):
                     raise UnicodeError(error_text)
             else:
                 raise UnicodeError(error_text)
-            
 
     def tokenize(self, doc):
         """
@@ -74,7 +76,8 @@ class TextProcessor(object):
         """
         Saves the structure, but puts all words into their normal_form
         """
-        doc = self.remove_brs(self.remove_urls(doc))
+        doc = self.remove_urls(doc)
+        doc = self.remove_brs(doc)
         tokens = self.tokenizer.tokenize(doc)
         normalized = [self.normalize_token(t) for t in tokens]
         return " ".join(normalized)
@@ -83,13 +86,13 @@ class TextProcessor(object):
         """
         Returns doc cleaned of url links
         """
-        return self.RE_URL.sub("", doc)
+        return self.RE_URL.sub(" ", doc)
 
     def remove_brs(self, doc):
         """
         Removes <br>
         """
-        return self.RE_BR.sub("", doc)
+        return self.RE_BR.sub(" ", doc)
 
     def count_urls(self, doc):
         """
@@ -97,9 +100,10 @@ class TextProcessor(object):
         Returns a dict {url: amount in doc}
         """
         urls = self.RE_URL.findall(doc)
-        return {u: urls.count(u) for u in set(urls)}
+        unique_urls = set(urls)
+        return {u: urls.count(u) for u in unique_urls}
 
-    def prepare_for_lda(self, doc, pos=None):
+    def prepare_for_lda(self, doc, only_nouns=True):
         """
         Preparing doc for lda
         by filtering from garbage of any kind
@@ -118,8 +122,10 @@ class TextProcessor(object):
         normalized = []
         for t in tokens:
             parsed = self.morph.parse(t)[0]
-            if pos and parsed.tag.POS == pos or pos is None:
-                normalized.append(parsed.normal_form)
+            is_noun = parsed.tag.POS == self.PYMORPHY_NOUN
+            if only_nouns and not is_noun:
+                continue
+            normalized.append(parsed.normal_form)
 
         # Applying stopwords filtering
         filtered = [w for w in normalized if w not in self.stop_words]

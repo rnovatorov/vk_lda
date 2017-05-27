@@ -6,7 +6,7 @@ class VKPostsGetter(object):
     """
     Used to download posts from VK wall
     """
-    def __init__(self, vk_access_token="", wait_time=0.4):
+    def __init__(self, vk_access_token="", wait_time=0.3):
         self.vk_api = self._init_vk_api(vk_access_token)
         self.wait_time = wait_time
         self.MAX_POSTS_PER_REQUEST = 100
