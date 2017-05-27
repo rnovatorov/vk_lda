@@ -32,8 +32,11 @@ Supposing target VK group has id 42:
 
   `python process_vk_posts.py 42_posts.json -o 42_prepared.json`
 
-  ### Hint:
+  #### Hint:
     It is also good idea to pass -n parameter to leave only nouns
+    
+  #### Hint:
+    You can extend stopwords by providing `-s` parameter
 
 3. Making LDA:
 
