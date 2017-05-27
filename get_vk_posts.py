@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 from tqdm import tqdm
 # Project
 import config as conf
-from src.utils import merge_iterators
+from src.utils import merge_iterators, json_dump
 from src.VKPostsGetter import VKPostsGetter
 
 
@@ -47,11 +47,15 @@ def main(args):
             docs.append(doc)
     
     print("Saving...")
-    with open(args.output_path, "w") as f:
-        json.dump(docs, f, indent=args.indent)
+    json_dump(docs, args.output_path, args.indent)
     print("Done")
 
+
 def compose_doc(post, comments, full_posts):
+    """
+    Composes doc out of post and its comments
+    Saves VK API response structure
+    """
     doc = {}
     if not post:
         return doc
@@ -68,40 +72,40 @@ if __name__ == "__main__":
     arg_parser = ArgumentParser()
     arg_parser.add_argument("owner_id",
         type=int,
-        help=""
+        help="id of wall owner, use negative number if group posts are needed"
     )
     arg_parser.add_argument("-o",
         dest="output_path",
         required=True,
-        help=""
+        help="path to save posts to"
     )
     arg_parser.add_argument("-f",
         dest="full_posts",
         action="store_true",
         required=False,
         default=False,
-        help=""
+        help="full post info needed"
     )
     arg_parser.add_argument("-c",
         dest="need_comments",
         action="store_true",
         required=False,
         default=False,
-        help=""
+        help="comments needed"
     )
     arg_parser.add_argument("-l",
         dest="need_likes",
         action="store_true",
         required=False,
         default=False,
-        help=""
+        help="likes needed"
     )
     arg_parser.add_argument("-i",
         dest="indent",
         type=int,
         required=False,
         default=2,
-        help=""
+        help="indent in json output file"
     )
     args = arg_parser.parse_args()
     main(args)

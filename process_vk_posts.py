@@ -6,26 +6,34 @@ from argparse import ArgumentParser
 from tqdm import tqdm
 # Project
 from src.TextProcessor import TextProcessor
+from src.utils import json_dump
 
 
 def main(args):
-    tproc = TextProcessor()
+    text_proc = TextProcessor()
 
-    posts = load_posts(args.input_path)
+    if args.stopwords_path:
+        custom_stopwords = load_custom_stopwords(args.stopwords_path)
+        text_proc.extend_stopwords(custom_stopwords)
+
+    posts = load_posts(args.posts_path)
     docs = parse_posts(posts)
 
     print("Normalizing...")
     prepared_docs = []
     for doc in tqdm(docs):
-        prepared = tproc.prepare_for_lda(doc, only_nouns=args.only_nouns)
+        prepared = text_proc.prepare_for_lda(doc, only_nouns=args.only_nouns)
         prepared_docs.append(prepared)
 
     print("Saving...")
-    save_docs(prepared_docs, args.output_path, args.indent)
+    json_dump(prepared_docs, args.output_path, args.indent)
     print("Done")
 
 
 def parse_posts(posts):
+    """
+    Parses posts
+    """
     docs = []
     for p in posts:
         post_text = p["post"]["text"]
@@ -38,36 +46,43 @@ def parse_posts(posts):
     return docs
 
 
-def load_posts(input_path):
-    with open(input_path) as f:
+def load_posts(posts_path):
+    with open(posts_path) as f:
         return json.load(f)
 
 
-def save_docs(docs, output_path, indent=2):
-    with open(output_path, "w") as f:
-        json.dump(docs, f, indent=indent)
+def load_custom_stopwords(stopwords_path):
+    with open(stopwords_path) as f:
+        return f.readlines()
 
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser()
-    arg_parser.add_argument("input_path",
-        help=""
+    arg_parser.add_argument("posts_path",
+        help="path to get posts from"
     )
-    arg_parser.add_argument("output_path",
-        help=""
+    arg_parser.add_argument("-o",
+        dest="output_path",
+        required=True,
+        help="path to save processed posts to"
+    )
+    arg_parser.add_argument("-s",
+        dest="stopwords_path",
+        required=False,
+        help="extend stopwords with given in file"
     )
     arg_parser.add_argument("-n",
         dest="only_nouns",
         action="store_true",
         required=False,
-        help=""
+        help="only nouns needed"
     )
     arg_parser.add_argument("-i",
         dest="indent",
         type=int,
         required=False,
         default=2,
-        help=""
+        help="indent in json output file"
     )
     args = arg_parser.parse_args()
     main(args)
