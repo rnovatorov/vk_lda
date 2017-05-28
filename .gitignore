@@ -1,6 +1,9 @@
 # Tmp files
 tmp
 
+# Bash scripts
+*.sh
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

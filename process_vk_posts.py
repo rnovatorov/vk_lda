@@ -51,9 +51,10 @@ def load_posts(posts_path):
         return json.load(f)
 
 
-def load_custom_stopwords(stopwords_path):
+def load_custom_stopwords(stopwords_path, encoding="utf-8"):
     with open(stopwords_path) as f:
-        return f.readlines()
+        return [w.decode(encoding).rstrip("\n\r")
+                for w in f.readlines()]
 
 
 if __name__ == "__main__":

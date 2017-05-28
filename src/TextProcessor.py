@@ -94,6 +94,12 @@ class TextProcessor(object):
         """
         return self.RE_BR.sub(" ", doc)
 
+    def remove_replies(self, doc):
+        """
+        Removes [id/club123456789|username]
+        """
+        return self.RE_REPLY.sub(" ", doc)
+
     def count_urls(self, doc):
         """
         Counts urls
@@ -112,8 +118,8 @@ class TextProcessor(object):
         doc = self.remove_urls(doc)
         # Removing <br>
         doc = self.remove_brs(doc)
-        # Removing [id123456789|username]
-        doc = self.RE_REPLY.sub("", doc)
+        # Removing replies
+        doc = self.remove_replies(doc)
 
         # Tokenizing
         tokens = self.tokenize(doc)
