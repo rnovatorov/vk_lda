@@ -8,10 +8,10 @@ Components:
 ===========
 
 It consists of these components:
-  1. get_vk_posts.py - responsible for getting posts
-  2. process_vk_posts.py - responsible for normalizing docs
-  3. make_lda.py - responsible for making sense of this shit
-  4. 
+  1. get_vk_posts.py - getting posts
+  2. process_vk_posts.py - normalizing docs
+  3. make_lda.py - making sense of this shit
+  4. interprete_json.py - interpreting ldas in human readable form
 
 
 Usage:
