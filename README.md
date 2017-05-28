@@ -10,8 +10,8 @@ Components:
 It consists of these components:
   1. get_vk_posts.py - getting posts
   2. process_vk_posts.py - normalizing docs
-  3. make_lda.py - making sense of this shit
-  4. interprete_json.py - interpreting ldas in human readable form
+  3. make_lda.py - using latent Dirichlet allocation to find popular topics
+  4. interprete_json.py - interpreting results in human readable form
 
 
 Usage:
