@@ -5,6 +5,7 @@ import json
 from argparse import ArgumentParser
 from tqdm import tqdm
 # Project
+import config as conf
 from src.TextProcessor import TextProcessor
 from src.utils import json_dump
 
@@ -52,9 +53,13 @@ def load_posts(posts_path):
 
 
 def load_custom_stopwords(stopwords_path, encoding="utf-8"):
-    with open(stopwords_path) as f:
-        return [w.decode(encoding).rstrip("\n\r")
-                for w in f.readlines()]
+    if conf.PYTHON_VERSION == 2:
+        with open(stopwords_path) as f:
+            stopwords = (sw.decode(encoding) for sw in f.readlines())
+    else:
+        with open(stopwords_path, encoding=encoding) as f:
+            stopwords = f.readlines()
+    return [sw.rstrip("\n\r") for sw in stopwords]
 
 
 if __name__ == "__main__":

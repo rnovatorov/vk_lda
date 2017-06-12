@@ -14,7 +14,6 @@ numexpr==2.6.2
 numpy==1.12.1
 packaging==16.8
 pandas==0.20.1
-progressbar==2.3
 py==1.4.33
 pyLDAvis==2.1.1
 pymorphy2==0.8
