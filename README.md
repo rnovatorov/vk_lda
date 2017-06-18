@@ -42,11 +42,11 @@ Supposing target VK group has id 42:
 #### 3. Making LDA:
 
   `python make_lda.py -t 7 -p 30 -o 42_lda.json`
-  
-#### 4. Interpreting result:
-
-  `python interprete_json.py -o 42_interpreted.txt 42_lda.json`
 
 where:
   - `-t` is amount of topics
   - `-p` amount of passes through text
+
+#### 4. Interpreting result:
+
+  `python interprete_json.py -o 42_interpreted.txt 42_lda.json`
