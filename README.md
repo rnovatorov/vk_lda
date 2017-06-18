@@ -37,7 +37,7 @@ Supposing target VK group has id 42:
     It is also good idea to pass `-n` parameter to leave only nouns
     
   #### Hint:
-    You can extend stopwords by providing `-s` parameter
+    You can extend stopwords by providing `-s` parameter and path to stopwords
 
 #### 3. Making LDA:
 
