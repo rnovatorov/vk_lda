@@ -1,8 +1,16 @@
+#### CUSTOM ####
+
 # Tmp files
 tmp
 
+# Resources
+resources
+
 # Bash scripts
 *.sh
+
+
+#### COMMON ####
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
