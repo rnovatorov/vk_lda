@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 
 def main(args):
     lda = load_file(args.input_path)
-    ljust_len = find_longest_word(lda)
+    ljust_len = find_longest_word_len(lda)
     converted = convert_to_txt(lda, ljust_len)
     save_contents(converted, args.output_path)
 
@@ -27,7 +27,7 @@ def convert_to_txt(lda, ljust_len, indent=4):
     return result
 
 
-def find_longest_word(lda):
+def find_longest_word_len(lda):
     longest = 0
     for topic in lda:
         for w, _ in topic:
