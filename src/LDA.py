@@ -4,7 +4,7 @@ from gensim import corpora, models
 
 class LDA(object):
     """
-    Realisation of latent Dirichlet allocation
+    Clusterize docs into topics using latent Dirichlet allocation
     """
     def __init__(self, docs, num_topics, passes):
         self.docs = docs
